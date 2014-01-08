@@ -40,18 +40,14 @@ static pthread_once_t g_init = PTHREAD_ONCE_INIT;
 static pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 
 char const*const PANEL_FILE = "/sys/class/backlight/panel/brightness";
-#ifndef EXYNOS4X12_TABLET
 char const*const BUTTON_FILE = "/sys/class/sec/sec_touchkey/brightness";
 
+#ifndef EXYNOS4X12_TABLET
 char const*const LED_RED = "/sys/class/sec/led/led_r";
 char const*const LED_GREEN = "/sys/class/sec/led/led_g";
 char const*const LED_BLUE = "/sys/class/sec/led/led_b";
 char const*const LED_BLINK = "/sys/class/sec/led/led_blink";
 char const*const LED_BRIGHTNESS = "/sys/class/sec/led/led_br_lev";
-#endif
-
-#ifdef EXYNOS4X12_TABLET_HAS_LED_BUTTONS
-char const*const BUTTON_FILE = "/sys/class/sec/sec_touchkey/brightness";
 #endif
 
 #define MAX_WRITE_CMD 25
@@ -178,13 +174,8 @@ set_light_buttons(struct light_device_t* dev,
     int brightness = rgb_to_brightness(state);
 
     pthread_mutex_lock(&g_lock);
-#ifdef EXYNOS4X12_TABLET_HAS_LED_BUTTONS
-    ALOGD("set_light_buttons: %d\n", brightness > 0 ? 1 : 0);
-    err = write_int(BUTTON_FILE, brightness > 0 ? 1 : 0);
-#else
     ALOGD("set_light_buttons: %d\n", brightness > 0 ? 1 : 2);
     err = write_int(BUTTON_FILE, brightness > 0 ? 1 : 2);
-#endif
     pthread_mutex_unlock(&g_lock);
 
     return err;
